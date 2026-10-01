@@ -1,0 +1,31 @@
+{
+  "name": "etl-pipeline",
+  "version": "1.0",
+  "concurrency": 3,
+  "run_timeout": "30s",
+  "tasks": [
+    {
+      "id": "fetch",
+      "dependencies": [],
+      "retry": {
+        "timeout": "5s",
+        "max_retries": 3,
+        "backoff": "exponential",
+        "initial_backoff": "100ms",
+        "max_backoff": "2s"
+      }
+    },
+    {
+      "id": "validate",
+      "dependencies": ["fetch"],
+      "retry": { "timeout": "2s", "max_retries": 1, "backoff": "fixed", "initial_backoff": "200ms" }
+    },
+    { "id": "transform-a", "dependencies": ["validate"] },
+    { "id": "transform-b", "dependencies": ["validate"] },
+    {
+      "id": "aggregate",
+      "dependencies": ["transform-a", "transform-b"]
+    },
+    { "id": "publish", "dependencies": ["aggregate"] }
+  ]
+}
