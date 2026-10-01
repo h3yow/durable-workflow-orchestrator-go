@@ -1,0 +1,19 @@
+{
+  "name": "demo-pipeline",
+  "tasks": [
+    {"id": "prepare"},
+    {"id": "fetch-a", "deps": ["prepare"]},
+    {"id": "fetch-b", "deps": ["prepare"]},
+    {
+      "id": "enrich",
+      "deps": ["fetch-a"],
+      "timeout": "2s",
+      "retry": {
+        "max_attempts": 4,
+        "backoff": {"kind": "fixed", "interval": "50ms", "max_delay": "1s"}
+      }
+    },
+    {"id": "combine", "deps": ["fetch-b", "enrich"]},
+    {"id": "report", "deps": ["combine"]}
+  ]
+}
